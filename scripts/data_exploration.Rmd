@@ -1,0 +1,78 @@
+---
+title: "social_media_NP_data_exploration"
+author: "Logan Hysen"
+date: "2024-07-22"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# Import packages
+library(dplyr)
+library(readxl)
+library(ggplot2)
+library(tidyr)
+```
+
+Let's define a function that will take our input data and then format it so we can plot it more easily
+```{r}
+
+```
+
+
+Read our sentiment data in
+```{r}
+dat <- read_excel("C:/Users/logan/Desktop/social_media_NP/data/National_Parks_with_topics_sentiment (1).xlsx", 
+                  sheet = 1)
+
+dat <- filter(dat, sentiment_confidence >=.50)
+dat <- group_by(dat, NP)
+
+
+```
+
+
+Calculate the mean sentiment for each National Park
+```{r}
+parkAvgs <- summarise(dat, avg = mean(overall_sentiment))
+
+print(parkAvgs)
+```
+
+```{r, message = TRUE, include = TRUE, fig.cap="Average NP visitation"}
+
+ggplot(parkAvgs, aes(y = avg, x = NP)) +
+  geom_point() +
+  lims(y = c(3,5)) +
+  theme(axis.text.x = element_text(size = 10, angle = 60, vjust = 1, hjust=1))
+
+```
+
+Let's calculate how many visitors left reviews from each country by NP
+
+```{r}
+dat_min <- select(dat, user_country, NP, topic, overall_sentiment, sentiment_confidence)
+
+#dat_long <- pivot_longer(dat_min, cols = c('user_country', 'NP'))
+
+dat_min%>%
+  group_by(NP, user_country) %>%
+  summarise(country_totals = n())
+```
+
+
+
+
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
